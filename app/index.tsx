@@ -23,14 +23,14 @@ export default function Index() {
             resizeMode="contain"
           />
 
-          <View className="relative mt-5">
+          <View className="mt-5">
             <Text className="text-3xl text-white font-psemibold text-center">
-              Discover Endless Possibilities with {' '}<Text className="text-secondary-200">Aora</Text>
+              Discover Endless Possibilities with {' '}<Text className="text-secondary-200 relative">Aora</Text>
             </Text>
 
             <Image 
               source={images.path as any}
-              className="w-[136px] h-[15px] absolute -bottom-2 -right-8"
+              className="w-[136px] h-[15px] absolute -bottom-2 right-14"
               resizeMode="contain"
             />
           </View>

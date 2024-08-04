@@ -14,3 +14,12 @@ export interface CustomButtonProps {
     textStyles: string,
     isLoading: boolean,
 }
+
+export interface FormFieldProps {
+    title: string,
+    value: string,
+    placeholder: string,
+    handleChangeText: any,
+    otherStyles: string,
+    keyboardType: string,
+}
