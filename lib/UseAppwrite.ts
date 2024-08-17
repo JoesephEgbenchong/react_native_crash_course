@@ -3,7 +3,8 @@ import { Models } from "react-native-appwrite";
 import { getAllPosts } from "./appwrite";
 import { Alert } from "react-native";
 
-const useAppwrite = (fn: (...args: any[]) => Promise<Models.Document[]>, ...args: any[]) => {
+const useAppwrite = (fn: (...args: any[]) => Promise<Models.Document[]
+>, ...args: any[]) => {
     const [data, setData] = useState<Models.Document[]>([]);
 
     const [isLoading, setIsLoading] = useState(false);

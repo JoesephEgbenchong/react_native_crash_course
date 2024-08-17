@@ -1,14 +1,17 @@
 import { getCurrentUser } from "@/lib/appwrite";
+import { UserDocument } from "@/types";
 import { createContext, useContext, useState, useEffect, FC, ReactNode, Dispatch, SetStateAction } from "react";
+import { Models } from "react-native-appwrite";
 
 interface User {
     $id: string;
+    
 }
 
 interface GlobalContextType {
 
-    user: User | null;
-    setUser: Dispatch<SetStateAction<User | null>>;
+    user: UserDocument | null;
+    setUser: Dispatch<SetStateAction<UserDocument | null>>;
     isLoading: boolean;
     isLoggedIn: boolean;
     setIsLoggedIn:Dispatch<SetStateAction<boolean>>;
@@ -22,13 +25,14 @@ export const useGlobalContext = () => useContext(GlobalContext);
 
 export const GlobalProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserDocument | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         getCurrentUser()
             .then((res) => {
                 if(res) {
+                    //console.log(res[0].avatar);
                     setIsLoggedIn(true);
                     setUser(res);
                 } else {

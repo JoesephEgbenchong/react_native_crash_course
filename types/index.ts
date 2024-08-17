@@ -1,4 +1,5 @@
 import { ImageSourcePropType } from "react-native"
+import { Models } from "react-native-appwrite";
 
 export interface TabIconProps {
     icon: any;
@@ -51,4 +52,11 @@ interface VideoPost {
 
 export interface VideoCardProps {
     videoPost: VideoPost
+}
+
+export interface UserDocument extends Models.Document {
+    $id: string;
+    username: string;
+    email: string;
+    avatar: string;
 }

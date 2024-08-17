@@ -1,3 +1,4 @@
+import { UserDocument } from "@/types";
 import { Account, Avatars, Client, Databases, ID, Query } from "react-native-appwrite"
 
 export const appwriteConfig = {
@@ -51,7 +52,7 @@ export const createUser = async (email: string, password: string, username: stri
             }
         )
 
-        return newUser;
+        return newUser as UserDocument;
 
     } catch (error) {
        console.log(error);
@@ -71,9 +72,10 @@ export const signIn = async (email: string, password: string) => {
     }
 }
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = async (): Promise<UserDocument | undefined> => {
     try {
         const currentAccount = await account.get();
+        
 
         if(!currentAccount) throw Error;
 
@@ -85,7 +87,8 @@ export const getCurrentUser = async () => {
 
         if(!currentUser) throw Error;
 
-        return currentUser.documents[0];
+        
+        return currentUser.documents[0] as UserDocument;
     } catch (error) {
         console.log(error);
     }
@@ -149,5 +152,35 @@ export const searchPosts = async (query: string) => {
     } catch (error) {
         //console.log(error as string)
         throw new Error(error as any);
+    }
+}
+
+export const getUserPosts = async (userId: string) => {
+
+    try {
+        
+        const posts = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.videoCollectionId,
+            [
+                Query.equal('creator', userId)
+            ]
+        );
+
+        return posts.documents;
+
+
+    } catch (error) {
+        throw new Error(error as any)
+    }
+}
+
+export const signOut = async () => {
+    try {
+        const session = await account.deleteSession('current');
+
+        return session;
+    } catch (error) {
+        throw new Error(error as any)
     }
 }
