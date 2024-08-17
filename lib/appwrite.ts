@@ -124,3 +124,30 @@ export  const getLatestPosts = async () => {
         throw new Error(error as any)
     }
 }
+
+export const searchPosts = async (query: string) => {
+
+    //console.log(query);
+
+    if (!query || typeof query !== 'string') {
+        throw new Error('Invalid query string');
+      }
+    
+    try {
+        
+        const posts = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.videoCollectionId,
+            [
+                Query.search('title', query)
+            ]
+        );
+
+        return posts.documents;
+
+
+    } catch (error) {
+        //console.log(error as string)
+        throw new Error(error as any);
+    }
+}

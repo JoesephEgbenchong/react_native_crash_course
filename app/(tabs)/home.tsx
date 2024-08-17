@@ -69,14 +69,7 @@ const Home = () => {
               </View>
             </View>
 
-            <SearchInput 
-              title=''
-              value=''
-              placeholder='Search for a video topic'
-              handleChangeText={() => {}}
-              otherStyles=''
-              keyboardType=''
-            />
+            <SearchInput />
 
             <View className='w-full flex-1 pt-5 pb-8'>
               <Text className='text-lg text-gray-100 font-pregular mb-3'>Latest Videos</Text>
