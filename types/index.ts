@@ -12,7 +12,7 @@ export interface CustomButtonProps {
     title: string;
     handlePress: () => void;
     containerStyles: string;
-    textStyles: string;
+    textStyles?: string;
     isLoading: boolean;
 }
 
@@ -22,7 +22,7 @@ export interface FormFieldProps {
     placeholder: string;
     handleChangeText: any;
     otherStyles: string;
-    keyboardType: string;
+    keyboardType?: string;
 }
 
 export interface Posts {
