@@ -7,10 +7,12 @@ import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av'
 const VideoCard= ({ videoPost: { title, thumbnail, video, creator: {username, avatar}} }: VideoCardProps) => {
     const [play, setPlay] = useState(false);
 
+    const [showMenu, setShowMenu] = useState(false);
+
   return (
     <View className='flex-col items-center px-4 mb-14'>
         <View className='flex-row gap-3 items-start'>
-            <View className='justify-center items-center flex-row flex-1'>
+            <View className='justify-center items-center flex-row flex-1 relative'>
                 <View className='w-[46px] h-[46px] rounded-lg border border-secondary justify-center items-center p-0.5'>
                     <Image 
                         source={{ uri: avatar }}
@@ -25,15 +27,44 @@ const VideoCard= ({ videoPost: { title, thumbnail, video, creator: {username, av
                     </Text>
                     <Text className='text-xs text-gray-100 font-pregular' numberOfLines={1}>{username}</Text>
                 </View>
+
+                { showMenu && (
+                    <View className='absolute flex-col bg-black-200 space-y-4 px-6 py-4 justify-center items-start rounded-xl -right-10 -bottom-20 z-10'>
+                        <TouchableOpacity className='flex-row items-center justify-center space-x-2'>
+                            <Image 
+                                source={icons.bookmark as any}
+                                className='w-4 h-4'
+                                resizeMode='contain'
+                            />
+
+                            <Text className='text-sm font-pmedium text-gray-100'>Save</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity className='flex-row items-center justify-center space-x-2'>
+                            <Image 
+                                source={icons.deleteIcon as any}
+                                className='w-4 h-4'
+                                resizeMode='contain'
+                            />
+
+                            <Text className='text-sm font-pmedium text-gray-100 '>Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
 
             <View className='pt-2'>
-                <Image 
-                    source={icons.menu as any}
-                    className='w-5 h-5'
-                    resizeMode='contain'
-                />
+                <TouchableOpacity 
+                    onPress={() => setShowMenu(!showMenu)}
+                >
+                    <Image 
+                        source={icons.menu as any}
+                        className='w-5 h-5'
+                        resizeMode='contain'
+                    />
+                </TouchableOpacity>
             </View>
+
         </View>
 
         {play ? (

@@ -5,7 +5,7 @@ import { FormFieldProps } from '@/types'
 import { icons } from '@/constants'
 import { router, usePathname } from 'expo-router'
 
-const SearchInput = ({ initialQuery }: { initialQuery?: string }) => {
+const SearchInput = ({ initialQuery, placeholderText }: { initialQuery?: string, placeholderText?: string }) => {
 
   const pathname = usePathname();
   const [query, setQuery] = useState<string>(initialQuery || '');
@@ -16,7 +16,7 @@ const SearchInput = ({ initialQuery }: { initialQuery?: string }) => {
         <TextInput 
             className='flex-1 text-white font-pregular mt-0.5 text-base'
             value={query}
-            placeholder="Search for a video topic"
+            placeholder= {!placeholderText ? "Search for a video topic": placeholderText }
             placeholderTextColor="#CDCDE0"
             onChangeText={(e) => setQuery(e)}
         />
