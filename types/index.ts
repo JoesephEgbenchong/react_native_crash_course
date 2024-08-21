@@ -36,6 +36,7 @@ export interface TrendingProps {
 export interface EmptyStateProps {
     title: string;
     subtitle: string;
+    showButton?: boolean;
 }
 
 interface Creator {
@@ -48,6 +49,8 @@ interface VideoPost {
     thumbnail: string;
     video: string;
     creator: Creator;
+    videoId?: string;
+    userId?: string;
 }
 
 export interface VideoCardProps {
@@ -59,4 +62,9 @@ export interface UserDocument extends Models.Document {
     username: string;
     email: string;
     avatar: string;
+}
+
+export interface Bookmark {
+    userId: string;
+    videoId: string;
 }

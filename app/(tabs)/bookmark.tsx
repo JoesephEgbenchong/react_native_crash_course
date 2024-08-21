@@ -1,19 +1,27 @@
-import { View, Text, SafeAreaView, FlatList } from 'react-native'
-import React from 'react'
+import { View, Text, SafeAreaView, FlatList, RefreshControl } from 'react-native'
+import React, { useState } from 'react'
 import { useGlobalContext } from '@/context/GlobalProvider'
 import { VideoCardProps } from '@/types';
 import VideoCard from '@/components/VideoCard';
 import SearchInput from '@/components/SearchInput';
 import EmptyState from '@/components/EmptyState';
 import useAppwrite from '@/lib/UseAppwrite';
-import { getUserPosts } from '@/lib/appwrite';
+import { getLikedVideos, getUserPosts } from '@/lib/appwrite';
 
 const Bookmark = () => {
 
   const authContext = useGlobalContext();
 
-  //todo: This call here is to populate the flat list. Will have to replace this by querying all saved videos by the user
-  const { data: posts } = useAppwrite(() => getUserPosts(authContext?.user?.$id as string))
+  //const { data: posts } = useAppwrite(() => getUserPosts(authContext?.user?.$id as string))
+  const { data: posts, isLoading, refetch } = useAppwrite(() =>getLikedVideos(authContext?.user?.$id as string));
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }
 
   return (
     <SafeAreaView className='bg-primary h-full'>
@@ -47,8 +55,10 @@ const Bookmark = () => {
           <EmptyState 
             title='No saved videos found'
             subtitle='No saved videos found for this profile'
+            showButton={false}
           />
         )}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       />
     </SafeAreaView>
   )

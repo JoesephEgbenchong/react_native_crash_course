@@ -47,6 +47,8 @@ const Home = () => {
               username: item.creator.username,
               avatar: item.creator.avatar
             },
+            userId: authContext?.user?.$id,
+            videoId: item.$id,
           };
 
           return <VideoCard videoPost={selectedAttributes} />

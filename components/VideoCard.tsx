@@ -1,13 +1,28 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { VideoCardProps } from '@/types'
 import { icons } from '@/constants'
 import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av'
+import { addBookmark } from '@/lib/appwrite'
 
-const VideoCard= ({ videoPost: { title, thumbnail, video, creator: {username, avatar}} }: VideoCardProps) => {
+const VideoCard= ({ videoPost: { title, thumbnail, video, creator: {username, avatar}, userId, videoId } }: VideoCardProps) => {
     const [play, setPlay] = useState(false);
 
     const [showMenu, setShowMenu] = useState(false);
+
+    const bookmarkVideo = async () => {
+        try {
+
+            await addBookmark(userId!, videoId!);
+
+            Alert.alert('Success', 'Post Bookmarked Successfully')
+
+            //todo: any action to be implemented here
+            
+        } catch (error) {
+            Alert.alert('Error', (error as any).message);
+        }
+    }
 
   return (
     <View className='flex-col items-center px-4 mb-14'>
@@ -30,7 +45,10 @@ const VideoCard= ({ videoPost: { title, thumbnail, video, creator: {username, av
 
                 { showMenu && (
                     <View className='absolute flex-col bg-black-200 space-y-4 px-6 py-4 justify-center items-start rounded-xl -right-10 -bottom-20 z-10'>
-                        <TouchableOpacity className='flex-row items-center justify-center space-x-2'>
+                        <TouchableOpacity 
+                            className='flex-row items-center justify-center space-x-2'
+                            onPress={bookmarkVideo}
+                        >
                             <Image 
                                 source={icons.bookmark as any}
                                 className='w-4 h-4'

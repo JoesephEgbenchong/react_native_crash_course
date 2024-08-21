@@ -1,5 +1,5 @@
-import { UserDocument } from "@/types";
-import { Account, Avatars, Client, Databases, ID, ImageGravity, Query, Storage } from "react-native-appwrite"
+import { Bookmark, UserDocument } from "@/types";
+import { Account, AppwriteException, Avatars, Client, Databases, ID, ImageGravity, Query, Storage } from "react-native-appwrite"
 
 export const appwriteConfig = {
     endpoint: 'https://cloud.appwrite.io/v1',
@@ -8,6 +8,7 @@ export const appwriteConfig = {
     databaseId: '66b1222000094330f309',
     userCollectionId: '66b1228b00031edc9b85',
     videoCollectionId: '66b122ca0035f01cd5f5',
+    bookmarkcollectionId: '66c61d2a0014a79632fe',
     storageId: '66b12510003428044def'
 }
 
@@ -61,6 +62,7 @@ export const createUser = async (email: string, password: string, username: stri
     }
 }
 
+//Sign In user
 export const signIn = async (email: string, password: string) => {
 
     try {
@@ -73,6 +75,7 @@ export const signIn = async (email: string, password: string) => {
     }
 }
 
+//Get current user
 export const getCurrentUser = async (): Promise<UserDocument | undefined> => {
     try {
         const currentAccount = await account.get();
@@ -95,6 +98,7 @@ export const getCurrentUser = async (): Promise<UserDocument | undefined> => {
     }
 }
 
+//Get all created videos
 export const getAllPosts = async () => {
     try {
 
@@ -111,6 +115,7 @@ export const getAllPosts = async () => {
     }
 }
 
+//Get latests videos
 export  const getLatestPosts = async () => {
     try {
 
@@ -130,6 +135,7 @@ export  const getLatestPosts = async () => {
     }
 }
 
+//Search posts
 export const searchPosts = async (query: string) => {
 
     //console.log(query);
@@ -157,6 +163,7 @@ export const searchPosts = async (query: string) => {
     }
 }
 
+//Get posts or videos created by userId
 export const getUserPosts = async (userId: string) => {
 
     try {
@@ -178,6 +185,8 @@ export const getUserPosts = async (userId: string) => {
     }
 }
 
+
+//Sign out user
 export const signOut = async () => {
     try {
         const session = await account.deleteSession('current');
@@ -187,6 +196,8 @@ export const signOut = async () => {
         throw new Error(error as any)
     }
 }
+
+
 
 export const getFilePreview = async (fileId: any, type: any) => {
     let fileUrl;
@@ -208,6 +219,7 @@ export const getFilePreview = async (fileId: any, type: any) => {
     }
 }
 
+//Get file preview on create video form
 export const uploadFile = async (file: any, type: any) => {
     if(!file) return;
 
@@ -229,6 +241,8 @@ export const uploadFile = async (file: any, type: any) => {
     }
 }
 
+
+//Create video upon filling form
 export const createVideo = async (form: any) => {
     try {
         const [thumbnailUrl, videoUrl] = await Promise.all([
@@ -252,5 +266,106 @@ export const createVideo = async (form: any) => {
         return newPost;
     } catch (error) {
         throw new Error(error as any)
+    }
+}
+
+//retrieve all videos liked by a userId
+export const getLikedVideos = async (userId: string) => {
+    try {
+
+        //console.log(userId);
+        if(!userId) {
+            throw new Error('User Id is required');
+        }
+
+        const bookmarks = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.bookmarkcollectionId,
+            [
+                Query.equal('userId', userId)
+            ]
+        );
+
+        //check if bookmarks were found
+        if(bookmarks.documents.length === 0){
+            console.log("No bookmarks found for this user");
+            return [];
+        }
+
+        //extract videos from bookmarks
+        const videosIds = bookmarks.documents.map(doc => doc.videoId.$id);
+        console.log(videosIds)
+
+        if(videosIds.length === 0) {
+            throw new Error("No Video IDs found for this bookmark");
+        }
+
+        //Query the videos collection corresponding to these videosID
+        const likedVideos = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.videoCollectionId,
+            [
+                Query.equal('$id', videosIds)
+            ]
+        );
+
+        return likedVideos.documents;
+
+    } catch (error) {
+        console.log((error as string))
+        throw new Error(error as any);
+        return [];
+    }
+}
+
+//add or save a bookmark
+export const addBookmark = async (userId: string, videoId: string): Promise<void> => {
+    try {
+        // validate inputs
+        if(!userId || !videoId) {
+            throw new Error('Both userId and videoID are required to add a bookmark');
+        }
+
+        //check if bookmark already exists
+        const existingBookmarks = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.bookmarkcollectionId,
+            [
+                Query.equal('userId', userId),
+                Query.equal('videoId', videoId)
+            ]
+        );
+
+        if(existingBookmarks.documents.length > 0) {
+            console.log('Bookmark already exists');
+            return;
+        }
+
+        //create new bookmark
+        const bookmark: Bookmark = {
+            userId,
+            videoId
+        }
+
+        await databases.createDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.bookmarkcollectionId,
+            ID.unique(),
+            bookmark
+        );
+
+        console.log('Bookmark added successfully');
+
+
+    } catch (error) {
+        //handle specific Appwrite errors
+        if (error instanceof AppwriteException) {
+            console.error('Appwrite error:', error.message)
+            // You can add specific handling for Appwrite errors here if needed
+        } else {
+            //General error handling
+            console.error('Failed to add bookmark:', error);
+        }
+
     }
 }
