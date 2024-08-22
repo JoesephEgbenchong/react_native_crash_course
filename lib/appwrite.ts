@@ -374,6 +374,11 @@ export const addBookmark = async (userId: string, videoId: string): Promise<void
 export const checkIfSaved = async (userId: string, videoId: string) => {
     try {
 
+        if(!userId || !videoId){
+            //they do not exist
+            return;
+        }
+
         const response = await databases.listDocuments(
             appwriteConfig.databaseId,
             appwriteConfig.bookmarkcollectionId,
