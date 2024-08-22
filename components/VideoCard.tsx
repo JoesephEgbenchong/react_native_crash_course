@@ -1,15 +1,18 @@
-import { View, Text, Image, TouchableOpacity, Alert } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, Image, TouchableOpacity, Alert, TouchableWithoutFeedback } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { VideoCardProps } from '@/types'
 import { icons } from '@/constants'
 import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av'
-import { addBookmark } from '@/lib/appwrite'
+import { addBookmark, checkIfSaved } from '@/lib/appwrite'
 
 const VideoCard= ({ videoPost: { title, thumbnail, video, creator: {username, avatar}, userId, videoId } }: VideoCardProps) => {
     const [play, setPlay] = useState(false);
 
-    const [showMenu, setShowMenu] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);//for displaying dropdown menu to save and delete video
+    const [isSaved, setIsSaved] = useState(false);//checking wether a video is saved or not.
+    
 
+    //save bookmark or bookmark video
     const bookmarkVideo = async () => {
         try {
 
@@ -23,6 +26,28 @@ const VideoCard= ({ videoPost: { title, thumbnail, video, creator: {username, av
             Alert.alert('Error', (error as any).message);
         }
     }
+
+    //handle touches outside save and delete view
+    const handleOutsidePress = () => {
+        setShowMenu(false);
+    }
+
+    //For verifying if video is actually saved and updating save state in case video is saved.
+    useEffect(() => {
+      const verifySavedState = async () => {
+        try {
+
+            const savedState = await checkIfSaved(userId!, videoId!);//await result of the promise
+            setIsSaved(!!savedState);
+            
+        } catch (error) {
+            console.error('Error checking if video is saved:', error);
+        }
+      }
+
+      verifySavedState();
+    }, [userId, videoId])
+    
 
   return (
     <View className='flex-col items-center px-4 mb-14'>
@@ -43,31 +68,37 @@ const VideoCard= ({ videoPost: { title, thumbnail, video, creator: {username, av
                     <Text className='text-xs text-gray-100 font-pregular' numberOfLines={1}>{username}</Text>
                 </View>
 
+                
                 { showMenu && (
-                    <View className='absolute flex-col bg-black-200 space-y-4 px-6 py-4 justify-center items-start rounded-xl -right-10 -bottom-20 z-10'>
-                        <TouchableOpacity 
-                            className='flex-row items-center justify-center space-x-2'
-                            onPress={bookmarkVideo}
-                        >
-                            <Image 
-                                source={icons.bookmark as any}
-                                className='w-4 h-4'
-                                resizeMode='contain'
-                            />
+                    <TouchableWithoutFeedback onPress={handleOutsidePress}>
+                        <View className='absolute flex-col bg-black-200 space-y-4 px-6 py-4 justify-center items-start rounded-xl -right-10 -bottom-20 z-10'>
+                            <TouchableOpacity 
+                                className='flex-row items-center justify-center space-x-2'
+                                onPress={bookmarkVideo}
+                                disabled={isSaved}
+                            >
+                                {!isSaved && (
+                                    <Image 
+                                        source={icons.bookmark as any}
+                                        className='w-4 h-4'
+                                        resizeMode='contain'
+                                    />
+                                )}
 
-                            <Text className='text-sm font-pmedium text-gray-100'>Save</Text>
-                        </TouchableOpacity>
+                                <Text className={`text-sm font-pmedium ${isSaved ? 'text-green-700' : 'text-gray-100'}`}>{isSaved ? 'Saved' : 'Save'}</Text>
+                            </TouchableOpacity>
 
-                        <TouchableOpacity className='flex-row items-center justify-center space-x-2'>
-                            <Image 
-                                source={icons.deleteIcon as any}
-                                className='w-4 h-4'
-                                resizeMode='contain'
-                            />
+                            <TouchableOpacity className='flex-row items-center justify-center space-x-2'>
+                                <Image 
+                                    source={icons.deleteIcon as any}
+                                    className='w-4 h-4'
+                                    resizeMode='contain'
+                                />
 
-                            <Text className='text-sm font-pmedium text-gray-100 '>Delete</Text>
-                        </TouchableOpacity>
-                    </View>
+                                <Text className='text-sm font-pmedium text-gray-100 '>Delete</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </TouchableWithoutFeedback>
                 )}
             </View>
 

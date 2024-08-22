@@ -7,6 +7,7 @@ import SearchInput from '@/components/SearchInput';
 import EmptyState from '@/components/EmptyState';
 import useAppwrite from '@/lib/UseAppwrite';
 import { getLikedVideos, getUserPosts } from '@/lib/appwrite';
+import SavedVideoCard from '@/components/SavedVideoCard';
 
 const Bookmark = () => {
 
@@ -40,7 +41,7 @@ const Bookmark = () => {
             },
           };
 
-          return <VideoCard videoPost={selectedAttributes} />
+          return <SavedVideoCard videoPost={selectedAttributes} />
         }}
         ListHeaderComponent={() => (
           <View className='my-12 px-4 w-full '>

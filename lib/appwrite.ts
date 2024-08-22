@@ -369,3 +369,25 @@ export const addBookmark = async (userId: string, videoId: string): Promise<void
 
     }
 }
+
+//verify if video is saved for by a specific user
+export const checkIfSaved = async (userId: string, videoId: string) => {
+    try {
+
+        const response = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.bookmarkcollectionId,
+            [
+                Query.equal('userId', userId),
+                Query.equal('videoId', videoId)
+            ]
+        );
+
+        if(response.documents.length > 0){
+            return true;//video is already saved
+        }
+        
+    } catch (error) {
+        throw new Error(error as any)
+    }
+}
